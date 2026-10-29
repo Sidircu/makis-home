@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Maki's home</title>
+<meta name="description" content="Maki's home: scarica il gioco per Android e Windows, o mettilo nella schermata Home dell'iPhone.">
+<link rel="icon" href="icona-32.png">
+<link rel="apple-touch-icon" href="icona-192.png">
+<meta name="theme-color" content="#2b3530">
+<style>
+@font-face { font-family: "Medieval"; src: url("MedievalSharp-Regular.ttf") format("truetype"); font-display: swap; }
+:root {
+  --verde: #2b3530; --verde-chiaro: #36433b; --crema: #f3ead6; --crema-scuro: #d9cba6;
+  --scuro: #1b211d; --oro: #ecc86a; --rosa: #ec8ea4;
+}
+* { box-sizing: border-box; }
+html { background: var(--scuro); }
+body {
+  margin: 0; min-height: 100vh; background: var(--verde); color: var(--crema);
+  font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.pagina { max-width: 560px; margin: 0 auto; padding: 16px; }
+.cornice { border: 3px solid var(--crema-scuro); box-shadow: 0 0 0 4px var(--scuro); padding: 18px 14px 22px; }
+.logo { display: block; width: 100%; max-width: 400px; height: auto; margin: 4px auto 0; }
+.sotto { text-align: center; font-family: "Medieval", Georgia, serif; font-size: 1.35rem; margin: 2px 0 10px; }
+.sotto .cuore { color: var(--rosa); }
+.scelte { display: flex; flex-direction: column; gap: 14px; }
+.scelta { background: var(--verde-chiaro); border: 2px solid var(--scuro); border-radius: 12px; padding: 14px 14px 10px; }
+.scelta.tua { border-color: var(--oro); box-shadow: 0 0 0 2px var(--oro); }
+.scelta h2 { font-family: "Medieval", Georgia, serif; font-weight: normal; font-size: 1.6rem; margin: 0 0 4px; }
+.etichetta { display: none; float: right; font-size: .8rem; color: var(--scuro); background: var(--oro); border-radius: 6px; padding: 1px 8px; margin-top: 6px; }
+.scelta.tua .etichetta { display: inline-block; }
+.bottone {
+  display: block; text-align: center; text-decoration: none; margin: 10px 0 8px; padding: 13px 10px;
+  background: var(--crema); color: var(--scuro); font-weight: 700; font-size: 1.1rem;
+  border: 3px solid var(--scuro); border-radius: 12px; box-shadow: 0 4px 0 var(--scuro);
+}
+.bottone:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--scuro); }
+ol { margin: 6px 0 4px; padding-left: 1.3em; }
+li { margin: 4px 0; }
+.nota { font-size: .92rem; color: var(--crema-scuro); margin: 6px 0 0; }
+.piede { margin-top: 18px; font-size: .92rem; color: var(--crema-scuro); }
+.piede b { color: var(--crema); }
+.crediti { margin-top: 10px; font-size: .75rem; color: #9fa79c; text-align: center; }
+.crediti a { color: inherit; }
+</style>
+</head>
+<body>
+<main class="pagina">
+  <div class="cornice">
+    <img class="logo" src="logo.png" alt="Maki's home" width="990" height="436">
+    <p class="sotto">scegli dove giocare <span class="cuore">&#9829;</span></p>
+
+    <div class="scelte">
+      <section class="scelta" id="iphone">
+        <h2>iPhone e iPad <span class="etichetta">il tuo</span></h2>
+        <p>Il gioco va nella schermata Home come un'app: si apre a schermo intero, funziona anche senza internet e si ricorda la partita.</p>
+        <ol>
+          <li>Apri questa pagina con <b>Safari</b>.</li>
+          <li>Tocca <b>Gioca su iPhone</b>: si apre il gioco.</li>
+          <li>Tocca il tasto <b>Condividi</b> (il quadrato con la freccia in su) e scegli <b>Aggiungi alla schermata Home</b>.</li>
+          <li>Da ora apri il gioco sempre dall'<b>icona sulla Home</b>, col telefono in orizzontale.</li>
+        </ol>
+        <a class="bottone" href="gioca/">Gioca su iPhone</a>
+        <p class="nota">La partita resta dentro l'icona: non cancellarla. Ogni tanto, dal menù del gioco, fai <b>Salvataggio &rarr; Esporta</b> e tieni il codice nelle note.</p>
+      </section>
+
+      <section class="scelta" id="android">
+        <h2>Android <span class="etichetta">il tuo</span></h2>
+        <a class="bottone" href="scarica/MakisHome.apk" download>Scarica per Android</a>
+        <ol>
+          <li>Se Chrome avvisa che il file può essere dannoso, scegli <b>Scarica comunque</b>: è il gioco.</li>
+          <li>Apri il file scaricato (<b>MakisHome.apk</b>).</li>
+          <li>Se il telefono lo chiede, consenti al browser di <b>installare app sconosciute</b>.</li>
+          <li>Tocca <b>Installa</b>: trovi Maki's home fra le tue app.</li>
+        </ol>
+      </section>
+
+      <section class="scelta" id="windows">
+        <h2>Windows <span class="etichetta">il tuo</span></h2>
+        <a class="bottone" href="scarica/MakisHome-Windows.zip" download>Scarica per Windows</a>
+        <ol>
+          <li>Apri lo zip scaricato e scegli <b>Estrai tutto</b>.</li>
+          <li>Apri <b>MakisHome.exe</b>.</li>
+          <li>Se Windows dice <b>PC protetto</b>, scegli <b>Ulteriori informazioni</b> e poi <b>Esegui comunque</b>.</li>
+        </ol>
+      </section>
+    </div>
+
+    <p class="piede"><b>La partita in tasca:</b> nel menù del gioco, <b>Salvataggio &rarr; Esporta</b> ti dà un codice con tutta la partita; con <b>Importa</b> la riprendi da quel codice, anche su un altro telefono o computer.</p>
+    <p class="crediti">Font MedievalSharp, <a href="MedievalSharp-OFL.txt">licenza SIL OFL</a>.</p>
+  </div>
+</main>
+<script>
+// il dispositivo di chi apre la pagina va per primo, con l'etichetta "il tuo"
+(function () {
+  var ua = navigator.userAgent || "";
+  var ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var id = ios ? "iphone" : /Android/.test(ua) ? "android" : /Windows/.test(ua) ? "windows" : "";
+  if (!id) return;
+  var s = document.getElementById(id);
+  s.classList.add("tua");
+  s.parentNode.insertBefore(s, s.parentNode.firstChild);
+})();
+</script>
+</body>
+</html>
