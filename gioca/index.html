@@ -95,7 +95,100 @@ body {
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 <link rel="manifest" href="index.manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><script>window.addEventListener('load',function(){var u=navigator.userAgent||'';var ios=/iPhone|iPad|iPod/.test(u)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);if(!ios||window.navigator.standalone)return;var d=document.createElement('div');d.id='maki-home';d.style.cssText='position:fixed;left:8px;right:8px;top:8px;z-index:9;background:#f3ead6;color:#1b211d;font:600 15px/1.35 system-ui,-apple-system,sans-serif;padding:10px 40px 10px 12px;border:3px solid #1b211d;border-radius:12px;box-shadow:0 3px 0 #1b211d';d.innerHTML='Per giocare come un\'app: tocca <b>Condividi</b> (il quadrato con la freccia) e poi <b>Aggiungi alla schermata Home</b>. Da l\u00ec il gioco si apre a schermo intero.';var x=document.createElement('span');x.textContent='\u00d7';x.style.cssText='position:absolute;right:12px;top:4px;font-size:24px;cursor:pointer';x.onclick=function(){d.remove()};d.appendChild(x);document.body.appendChild(d)})</script>
-	</head>
+	<script>
+/* AUDIO SU IPHONE (v2.0.6). Su iPhone il gioco nel browser era muto.
+ * 1) Il suono di una pagina web (Web Audio) per iOS è "di sottofondo": con
+ *    l'interruttore laterale su silenzioso non si sente niente. Da iOS 16.4
+ *    si può dire che è come una musica: navigator.audioSession.type =
+ *    "playback", e si sente anche col silenzioso (il volume resta quello dei
+ *    tasti). Sugli iOS più vecchi lo stesso effetto lo dà un elemento <audio>
+ *    che suona un silenzio mentre la pagina è aperta.
+ * 2) Safari tiene fermo l'audio finché non si tocca lo schermo, e lo ferma di
+ *    nuovo quando si cambia app o arriva una chiamata ("interrupted"): qui a
+ *    ogni tocco si fa ripartire il contesto audio del gioco, se è fermo.
+ * 3) Quando la pagina va in secondo piano il gioco tace (si sospende il
+ *    contesto audio) e riparte tornando.
+ * Va nella pagina del gioco prima del motore (tools/esporta/sistema_web.py). */
+(function () {
+	var AC = window.AudioContext || window.webkitAudioContext;
+	if (!AC) {
+		return;
+	}
+	try {
+		if (navigator.audioSession) {
+			navigator.audioSession.type = 'playback';
+		}
+	} catch (e) { /* niente */ }
+	var contesti = [];
+	function ContestoAudio(opzioni) {
+		var c = opzioni === undefined ? new AC() : new AC(opzioni);
+		contesti.push(c);
+		return c;
+	}
+	ContestoAudio.prototype = AC.prototype;
+	window.AudioContext = ContestoAudio;
+	if (window.webkitAudioContext) {
+		window.webkitAudioContext = ContestoAudio;
+	}
+	window.makiAudio = { contesti: contesti };
+	var muto = null;
+	function silenzio() {
+		if (navigator.audioSession || document.hidden) {
+			return;
+		}
+		if (muto === null) {
+			muto = document.createElement('audio');
+			muto.setAttribute('x-webkit-airplay', 'deny');
+			muto.setAttribute('playsinline', '');
+			muto.preload = 'auto';
+			muto.loop = true;
+			muto.src = 'data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+		}
+		if (muto.paused) {
+			var p = muto.play();
+			if (p && p.catch) {
+				p.catch(function () { /* al prossimo tocco */ });
+			}
+		}
+	}
+	function sveglia() {
+		for (var i = 0; i < contesti.length; i++) {
+			var c = contesti[i];
+			if (c.state !== 'running' && c.state !== 'closed') {
+				try {
+					var p = c.resume();
+					if (p && p.catch) {
+						p.catch(function () { /* al prossimo tocco */ });
+					}
+				} catch (e) { /* niente */ }
+			}
+		}
+		silenzio();
+	}
+	['touchend', 'click', 'keydown', 'pointerup', 'mousedown'].forEach(function (t) {
+		document.addEventListener(t, sveglia, true);
+	});
+	// in un'altra app il gioco tace (suonando "come una musica" iOS lo lascerebbe
+	// andare anche dietro); tornando, riparte da solo o al primo tocco
+	document.addEventListener('visibilitychange', function () {
+		if (document.hidden) {
+			if (muto !== null) {
+				muto.pause();
+			}
+			for (var i = 0; i < contesti.length; i++) {
+				if (contesti[i].state === 'running') {
+					try {
+						contesti[i].suspend();
+					} catch (e) { /* niente */ }
+				}
+			}
+		} else {
+			sveglia();
+		}
+	});
+})();
+</script>
+</head>
 	<body>
 		<canvas id="canvas">
 			Your browser does not support the canvas tag.
@@ -113,7 +206,7 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":34396684,"index.wasm":39509339},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":30374936,"index.wasm":39509339},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
