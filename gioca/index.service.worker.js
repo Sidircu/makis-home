@@ -4,9 +4,10 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1793702160|7324149';
+const CACHE_VERSION = '1793706615|5593309';
 /** @type {string} */
-const CACHE_PREFIX = "Maki's home-sw-cache-";
+const CACHE_PREFIX = "Maky's home-sw-cache-";
+const CACHE_PREFIX_VECCHIO = "Maki's home-sw-cache-";
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 /** @type {string} */
 const OFFLINE_URL = 'index.offline.html';
@@ -28,7 +29,7 @@ self.addEventListener('activate', (event) => {
 	event.waitUntil(caches.keys().then(
 		function (keys) {
 			// Remove old caches.
-			return Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map((key) => caches.delete(key)));
+			return Promise.all(keys.filter((key) => (key.startsWith(CACHE_PREFIX) || key.startsWith(CACHE_PREFIX_VECCHIO)) && key !== CACHE_NAME).map((key) => caches.delete(key)));
 		}
 	).then(function () {
 		// Enable navigation preload if available.
