@@ -188,6 +188,48 @@ body {
 	});
 })();
 </script>
+<script>
+/* DENSITÀ DELLO SCHERMO (v2.0.7). Il gioco nel browser disegna su una tela
+ * grande quanto lo schermo in pixel veri: finestra x densità (devicePixelRatio).
+ * Un iPhone ha densità 3: in orizzontale la tela era 2532x1170, quasi 3 milioni
+ * di pixel, e il browser tiene più copie di quella tela nella memoria della
+ * scheda grafica. Misurato nel browser: a densità 2 la parte grafica usa circa
+ * 66 MB in meno e ogni fotogramma ha meno della metà dei pixel da disegnare.
+ * Su iPhone la memoria è poca e Safari ricarica la pagina quando ne usa troppa.
+ * Qui la densità si ferma a 2 (computer e iPad di solito sono già a 1 o 2): il
+ * gioco riempie lo schermo uguale, con la grafica un po' meno fine.
+ * Il browser allarga la tela fino ai pixel veri dello schermo: "a pixel"
+ * (image-rendering: pixelated), senza sfumare, come si fa per la grafica a
+ * pixel. Dove la densità è 2 o meno la tela è già grande quanto lo schermo e
+ * questo non cambia niente.
+ * Va nella pagina del gioco prima del motore (tools/esporta/sistema_web.py). */
+(function () {
+	var MASSIMA = 2;
+	try {
+		var d = Object.getOwnPropertyDescriptor(window, 'devicePixelRatio');
+		if (!d && window.Window && Window.prototype) {
+			d = Object.getOwnPropertyDescriptor(Window.prototype, 'devicePixelRatio');
+		}
+		var vera = function () {
+			var v = d && d.get ? d.get.call(window) : (d ? d.value : 1);
+			return typeof v === 'number' && v > 0 ? v : 1;
+		};
+		Object.defineProperty(window, 'devicePixelRatio', {
+			configurable: true,
+			enumerable: true,
+			get: function () {
+				return Math.min(vera(), MASSIMA);
+			},
+		});
+		window.makiDensita = { vera: vera, massima: MASSIMA };
+	} catch (e) { /* si resta con la densità dello schermo */ }
+	try {
+		var stile = document.createElement('style');
+		stile.textContent = '#canvas { image-rendering: pixelated; }';
+		document.head.appendChild(stile);
+	} catch (e) { /* il browser allarga la tela sfumando */ }
+})();
+</script>
 </head>
 	<body>
 		<canvas id="canvas">
@@ -206,7 +248,7 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":30374936,"index.wasm":39509339},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":30376248,"index.wasm":39509339},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
