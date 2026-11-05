@@ -230,6 +230,20 @@ body {
 	});
 })();
 </script>
+<script>
+// DATI DA NON CANCELLARE (v2.0.15): il salvataggio del gioco sta nel browser;
+// si chiede di tenerlo anche quando il telefono deve fare spazio
+(function () {
+	try {
+		if (navigator.storage && navigator.storage.persist) {
+			navigator.storage.persisted().then(function (gia) {
+				if (!gia) { navigator.storage.persist().then(function (si) { window.makyDatiProtetti = si; }); }
+				else { window.makyDatiProtetti = true; }
+			}).catch(function () {});
+		}
+	} catch (e) {}
+})();
+</script>
 </head>
 	<body>
 		<canvas id="canvas">
@@ -248,7 +262,7 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":30542432,"index.wasm":39509339},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":30548024,"index.wasm":39509339},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 

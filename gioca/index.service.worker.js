@@ -4,11 +4,15 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1793846288|5686050';
+const CACHE_VERSION = '1793878626|7619981';
 /** @type {string} */
 const CACHE_PREFIX = "Maky's home-sw-cache-";
 const CACHE_PREFIX_VECCHIO = "Maki's home-sw-cache-";
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
+// v2.0.15 (Maky): il motore (index.wasm) non cambia fra una versione e l'altra del gioco:
+// sta in una cache sua, col nome dato dal suo contenuto, che gli aggiornamenti non cancellano
+const MOTORE = 'index.wasm';
+const CACHE_MOTORE = CACHE_PREFIX + 'motore-' + "7eda98958eb09135";
 /** @type {string} */
 const OFFLINE_URL = 'index.offline.html';
 /** @type {boolean} */
@@ -29,7 +33,7 @@ self.addEventListener('activate', (event) => {
 	event.waitUntil(caches.keys().then(
 		function (keys) {
 			// Remove old caches.
-			return Promise.all(keys.filter((key) => (key.startsWith(CACHE_PREFIX) || key.startsWith(CACHE_PREFIX_VECCHIO)) && key !== CACHE_NAME).map((key) => caches.delete(key)));
+			return Promise.all(keys.filter((key) => (key.startsWith(CACHE_PREFIX) || key.startsWith(CACHE_PREFIX_VECCHIO)) && key !== CACHE_NAME && key !== CACHE_MOTORE).map((key) => caches.delete(key)));
 		}
 	).then(function () {
 		// Enable navigation preload if available.
@@ -104,11 +108,12 @@ self.addEventListener(
 		if (isNavigate || isCacheable) {
 			event.respondWith((async () => {
 				// Try to use cache first
-				const cache = await caches.open(CACHE_NAME);
+				const cache = await caches.open(local === MOTORE ? CACHE_MOTORE : CACHE_NAME);
+				const motore = await caches.open(CACHE_MOTORE);
 				if (isNavigate) {
 					// Check if we have full cache during HTML page request.
 					/** @type {Response[]} */
-					const fullCache = await Promise.all(FULL_CACHE.map((name) => cache.match(name)));
+					const fullCache = await Promise.all(FULL_CACHE.map((name) => (name === MOTORE ? motore : cache).match(name)));
 					const missing = fullCache.some((v) => v === undefined);
 					if (missing) {
 						try {
